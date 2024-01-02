@@ -1,3 +1,3 @@
-module github.com/bondzai/gominal
+module Messenger
 
 go 1.20

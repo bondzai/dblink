@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  hexagon:
+    hostname: hexagon
+    container_name: hexagon-con
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      - TZ=UTC
+    command: ["./main"]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "4G"

@@ -1,50 +1,44 @@
 package main
 
 import (
+	"Messenger/internal/adapters/handler"
+	"Messenger/internal/adapters/repository"
+	"Messenger/internal/core/services"
+	"flag"
 	"fmt"
-	"io"
-	"net/http"
-	"os/exec"
+
+	"github.com/gin-gonic/gin"
+)
+
+var (
+	repo      = flag.String("db", "postgres", "Database for storing messages")
+	redisHost = "localhost:6379"
+	// httpHandler *handler.HTTPHandler
+	svc *services.MessengerService
 )
 
 func main() {
-	http.HandleFunc("/execute", executeHandler)
-	port := 8080
-	fmt.Printf("Server is running on :%d\n", port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-	if err != nil {
-		fmt.Println("Error starting server:", err)
+	flag.Parse()
+
+	fmt.Printf("Application running using %s\n", *repo)
+	switch *repo {
+	case "redis":
+		store := repository.NewMessengerRedisRepository(redisHost)
+		svc = services.NewMessengerService(store)
+	default:
+		store := repository.NewMessengerPostgresRepository()
+		svc = services.NewMessengerService(store)
 	}
+
+	InitRoutes()
+
 }
 
-func executeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	command := r.FormValue("command")
-	if command == "" {
-		http.Error(w, "Command not provided", http.StatusBadRequest)
-		return
-	}
-
-	output, err := executeCommand(command)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error executing command: %s", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, output)
-}
-
-func executeCommand(command string) (string, error) {
-	cmd := exec.Command("bash", "-c", command)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", err
-	}
-	return string(output), nil
+func InitRoutes() {
+	router := gin.Default()
+	handler := handler.NewHTTPHandler(*svc)
+	router.GET("/messages/:id", handler.ReadMessage)
+	router.GET("/messages", handler.ReadMessages)
+	router.POST("/messages", handler.SaveMessage)
+	router.Run(":5000")
 }

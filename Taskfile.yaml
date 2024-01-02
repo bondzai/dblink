@@ -1,8 +1,14 @@
 version: "3"
 
 tasks:
-  tidy:
+  run:
     cmds:
-      - echo "go mod tidy..."
-      - go mod tidy
+      - echo "server starting..."
+      - go run cmd/main.go
+    silent: true
+
+  run-redis:
+    cmds:
+      - echo "server starting with redis..."
+      - go run cmd/main.go --db=redis
     silent: true

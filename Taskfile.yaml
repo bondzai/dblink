@@ -1,0 +1,8 @@
+version: "3"
+
+tasks:
+  tidy:
+    cmds:
+      - echo "go mod tidy..."
+      - go mod tidy
+    silent: true

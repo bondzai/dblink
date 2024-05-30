@@ -2,7 +2,7 @@
     "WorkingDir": ".",
     "SourceDir": ["."],
     "SourceExt": [".c", ".cpp", ".go", ".h"],
-    "BuildCmd": "go build -o bin/gominal ./cmd/main.go",
-    "RunCmd": "./bin/gominal",
+    "BuildCmd": "go build -o bin/dblink ./cmd/main.go",
+    "RunCmd": "./bin/dblink",
     "Decreasing": 1
 }

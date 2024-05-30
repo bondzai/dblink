@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"sync"
 
@@ -14,21 +13,23 @@ import (
 
 type WebSocketHandler struct {
 	userService *services.UserService
-	connections map[*websocket.Conn]struct{}
+	connections map[string]map[*websocket.Conn]struct{}
 	mutex       sync.Mutex
 }
 
 func NewWebSocketHandler(userService *services.UserService) *WebSocketHandler {
 	return &WebSocketHandler{
 		userService: userService,
-		connections: make(map[*websocket.Conn]struct{}),
+		connections: make(map[string]map[*websocket.Conn]struct{}),
 	}
 }
 
 func (h *WebSocketHandler) ReadUser(c *websocket.Conn) {
 	defer func() {
 		h.mutex.Lock()
-		delete(h.connections, c)
+		for id := range h.connections {
+			delete(h.connections[id], c)
+		}
 		h.mutex.Unlock()
 	}()
 
@@ -49,7 +50,10 @@ func (h *WebSocketHandler) ReadUser(c *websocket.Conn) {
 	c.WriteMessage(websocket.TextMessage, data)
 
 	h.mutex.Lock()
-	h.connections[c] = struct{}{}
+	if _, ok := h.connections[id]; !ok {
+		h.connections[id] = make(map[*websocket.Conn]struct{})
+	}
+	h.connections[id][c] = struct{}{}
 	h.mutex.Unlock()
 
 	for {
@@ -78,9 +82,6 @@ func (h *WebSocketHandler) UpdateUser(c *websocket.Conn) {
 			continue
 		}
 
-		fmt.Println("location")
-		fmt.Println(location)
-
 		user, err := h.userService.UpdateUser(context.Background(), id, &location)
 		if err != nil {
 			c.WriteMessage(websocket.TextMessage, []byte("Error: "+err.Error()))
@@ -94,7 +95,7 @@ func (h *WebSocketHandler) UpdateUser(c *websocket.Conn) {
 		}
 
 		h.mutex.Lock()
-		for conn := range h.connections {
+		for conn := range h.connections[id] {
 			conn.WriteMessage(websocket.TextMessage, data)
 		}
 		h.mutex.Unlock()

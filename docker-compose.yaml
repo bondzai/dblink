@@ -1,9 +1,7 @@
-version: "3.8"
-
 services:
-  hexagon:
-    hostname: hexagon
-    container_name: hexagon-con
+  dblink:
+    hostname: dblink
+    container_name: dblink-con
     build:
       context: .
       dockerfile: Dockerfile

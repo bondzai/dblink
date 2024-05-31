@@ -76,6 +76,14 @@ func main() {
 	userService := services.NewUserService(redisRepo)
 	wsHandler := handlers.NewWebSocketHandler(userService)
 
+	app.Use("/ws", func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			c.Locals("allowed", true)
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+
 	app.Get("/ws/read/:id", websocket.New(wsHandler.ReadUser))
 	app.Get("/ws/update/:id", websocket.New(wsHandler.UpdateUser))
 

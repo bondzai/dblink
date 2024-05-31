@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 
+	"github.com/bondzai/dblink/internal/interfaces/repositories"
 	"github.com/bondzai/dblink/internal/models"
-	"github.com/bondzai/dblink/internal/repositories"
 )
 
 type UserService struct {

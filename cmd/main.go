@@ -6,10 +6,11 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/bondzai/dblink/internal/handlers"
+	"github.com/bondzai/dblink/internal/interfaces/handlers"
+	"github.com/bondzai/dblink/internal/interfaces/repositories"
 	"github.com/bondzai/dblink/internal/models"
-	"github.com/bondzai/dblink/internal/repositories"
 	"github.com/bondzai/dblink/internal/services"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"

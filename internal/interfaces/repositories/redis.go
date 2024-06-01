@@ -22,11 +22,13 @@ func (r *RedisRepository) GetUser(ctx context.Context, id string) (*models.User,
 	if err != nil {
 		return nil, err
 	}
+
 	var user models.User
 	err = json.Unmarshal([]byte(data), &user)
 	if err != nil {
 		return nil, err
 	}
+
 	return &user, nil
 }
 
@@ -35,5 +37,6 @@ func (r *RedisRepository) UpdateUser(ctx context.Context, id string, user *model
 	if err != nil {
 		return err
 	}
+
 	return r.client.Set(ctx, id, data, 0).Err()
 }

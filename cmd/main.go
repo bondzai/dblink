@@ -8,7 +8,6 @@ import (
 
 	"github.com/bondzai/dblink/internal/interfaces/handlers"
 	"github.com/bondzai/dblink/internal/interfaces/repositories"
-	"github.com/bondzai/dblink/internal/models"
 	"github.com/bondzai/dblink/internal/services"
 
 	"github.com/go-redis/redis/v8"
@@ -23,32 +22,9 @@ func init() {
 		Addr: "localhost:6379",
 	})
 
-	users := []models.User{
-		{
-			UserID:   1,
-			UserName: "John",
-			Location: models.Location{
-				Lat:  1.1,
-				Long: 1.1,
-			},
-		},
-		{
-			UserID:   2,
-			UserName: "Jane",
-			Location: models.Location{
-				Lat:  2.2,
-				Long: 2.2,
-			},
-		},
-		{
-			UserID:   3,
-			UserName: "Doe",
-			Location: models.Location{
-				Lat:  3.3,
-				Long: 3.3,
-			},
-		},
-	}
+	mdb := repositories.NewMockRepo()
+
+	users := mdb.MockUsers()
 
 	for _, user := range users {
 		data, err := json.Marshal(user)

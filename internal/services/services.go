@@ -24,10 +24,12 @@ func (s *UserService) UpdateUser(ctx context.Context, id string, location *model
 	if err != nil {
 		return nil, err
 	}
+
 	user.Location = *location
 	err = s.repo.UpdateUser(ctx, id, user)
 	if err != nil {
 		return nil, err
 	}
+
 	return user, nil
 }

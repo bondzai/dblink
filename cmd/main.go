@@ -21,8 +21,6 @@ func main() {
 	userService := services.NewUserService(redisRepo)
 	wsHandler := handlers.NewWebSocketHandler(userService)
 
-	app.Use("/ws", wsHandler.HandleWsUpgrade)
-
 	app.Get("/ws/read/:id", websocket.New(wsHandler.ReadUser))
 	app.Get("/ws/update/:id", websocket.New(wsHandler.UpdateUser))
 

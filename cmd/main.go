@@ -17,6 +17,14 @@ func main() {
 		Addr: "localhost:6379",
 	})
 
+	app.Use("/ws", func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			c.Locals("allowed", true)
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+
 	redisRepo := repositories.NewRedisRepository(rdb)
 	userService := services.NewUserService(redisRepo)
 	wsHandler := handlers.NewWebSocketHandler(userService)

@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/uuid@8.3.2/dist/umd/uuidv4.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const driverID = uuidv4(); // Generate a random UUID for the driver ID
+            const driverID = uuidv4();
             console.log("Driver ID:", driverID);
 
             const socket = new WebSocket(`ws://localhost:8080/ws/${driverID}`);
@@ -33,14 +33,12 @@
             socket.onopen = function() {
                 console.log('Connected to WebSocket');
 
-                // Generate random device ID
                 const deviceId = uuidv4();
                 console.log('Device ID:', deviceId);
 
-                // Send random location updates every 2 seconds
                 setInterval(() => {
-                    const lat = (Math.random() * 180 - 90).toFixed(6);  // Random latitude between -90 and 90
-                    const long = (Math.random() * 360 - 180).toFixed(6);  // Random longitude between -180 and 180
+                    const lat = (Math.random() * 180 - 90).toFixed(6);
+                    const long = (Math.random() * 360 - 180).toFixed(6);
                     
                     const update = {
                         location: {
@@ -53,7 +51,7 @@
                     };
 
                     socket.send(JSON.stringify(update));
-                }, 5000);  // 2000 ms = 2 seconds
+                }, 5000);
             };
 
             socket.onclose = function() {

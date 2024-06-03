@@ -9,7 +9,6 @@ import (
 )
 
 type DriverDTO struct {
-	ID           string             `json:"id"`
 	Location     DriverLocation     `json:"location"`
 	LoginSession DriverLoginSession `json:"loginSession"`
 	Type         DriverType         `json:"type"`

@@ -1,11 +1,13 @@
 module github.com/bondzai/dblink
 
-go 1.22
+go 1.22.2
 
 require (
+	github.com/bondzai/gogear v0.0.0-20240525052351-b636aad3969d
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/gofiber/websocket/v2 v2.2.1
+	github.com/google/uuid v1.5.0
 )
 
 require (
@@ -13,7 +15,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fasthttp/websocket v1.5.3 // indirect
-	github.com/google/uuid v1.5.0 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

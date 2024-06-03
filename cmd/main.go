@@ -33,10 +33,10 @@ type DriverType struct {
 }
 
 var (
-	drivers = make(map[string]DriverDTO)
-	clients = make(map[string]map[*websocket.Conn]bool)
-	lock    = &sync.Mutex{}
-	mutex   = &sync.Mutex{}
+	drivers  = make(map[string]DriverDTO)
+	clients  = make(map[string]map[*websocket.Conn]bool)
+	muRead   = &sync.Mutex{}
+	muUpdate = &sync.Mutex{}
 )
 
 func main() {
@@ -45,12 +45,12 @@ func main() {
 	app.Get("/ws/:id", websocket.New(func(c *websocket.Conn) {
 		driverID := c.Params("id")
 
-		lock.Lock()
+		muRead.Lock()
 		if clients[driverID] == nil {
 			clients[driverID] = make(map[*websocket.Conn]bool)
 		}
 		clients[driverID][c] = true
-		lock.Unlock()
+		muRead.Unlock()
 
 		// Send DTO instantly on connection
 		dto := createDriverDTO(driverID)
@@ -59,12 +59,12 @@ func main() {
 		}
 
 		defer func() {
-			lock.Lock()
+			muRead.Lock()
 			delete(clients[driverID], c)
 			if len(clients[driverID]) == 0 {
 				delete(clients, driverID)
 			}
-			lock.Unlock()
+			muRead.Unlock()
 			c.Close()
 		}()
 
@@ -82,7 +82,14 @@ func main() {
 }
 
 func createDriverDTO(driverID string) DriverDTO {
-	// Construct your DriverDTO here with any initial data you want to send to the client
+	muRead.Lock()
+	defer muRead.Unlock()
+
+	if driver, exists := drivers[driverID]; exists {
+		return driver
+	}
+
+	// If the driver doesn't exist, Query from database and construct a new DriverDTO
 	return DriverDTO{
 		ID: driverID,
 		Location: DriverLocation{
@@ -103,8 +110,8 @@ func createDriverDTO(driverID string) DriverDTO {
 }
 
 func processUpdate(driverID string, updateData map[string]interface{}) {
-	mutex.Lock()
-	defer mutex.Unlock()
+	muUpdate.Lock()
+	defer muUpdate.Unlock()
 
 	driver, exists := drivers[driverID]
 	if !exists {
@@ -137,8 +144,8 @@ func processUpdate(driverID string, updateData map[string]interface{}) {
 }
 
 func broadcastLocation(driverID string, driver DriverDTO) {
-	lock.Lock()
-	defer lock.Unlock()
+	muRead.Lock()
+	defer muRead.Unlock()
 
 	for client := range clients[driverID] {
 		if err := client.WriteJSON(driver); err != nil {

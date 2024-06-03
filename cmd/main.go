@@ -3,36 +3,15 @@ package main
 import (
 	"sync"
 
+	"github.com/bondzai/dblink/internal/domain"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	"github.com/google/uuid"
 )
 
-type DriverDTO struct {
-	Location     DriverLocation     `json:"location"`
-	LoginSession DriverLoginSession `json:"loginSession"`
-	Type         DriverType         `json:"type"`
-	Job          *uuid.UUID         `json:"job"`
-}
-
-type DriverLocation struct {
-	Lat  string `json:"lat"`
-	Long string `json:"long"`
-}
-
-type DriverLoginSession struct {
-	DeviceID string `json:"deviceId"`
-}
-
-type DriverType struct {
-	CompanyApproveStatus int       `json:"companyApproveStatus"`
-	JobAcceptStatus      *int      `json:"jobAcceptStatus"`
-	IsInternalCompany    bool      `json:"isInternalCompany"`
-	VehicleTypeID        uuid.UUID `json:"vehicleTypeId"`
-}
-
 var (
-	drivers  = make(map[string]DriverDTO)
+	drivers  = make(map[string]domain.DriverDTO)
 	clients  = make(map[string]map[*websocket.Conn]bool)
 	muRead   = &sync.Mutex{}
 	muUpdate = &sync.Mutex{}
@@ -79,7 +58,7 @@ func main() {
 	app.Listen(":8080")
 }
 
-func getLatestData(driverID string) DriverDTO {
+func getLatestData(driverID string) domain.DriverDTO {
 	muRead.Lock()
 	defer muRead.Unlock()
 
@@ -87,15 +66,15 @@ func getLatestData(driverID string) DriverDTO {
 		return driver
 	}
 
-	return DriverDTO{
-		Location: DriverLocation{
+	return domain.DriverDTO{
+		Location: domain.DriverLocation{
 			Lat:  "0",
 			Long: "0",
 		},
-		LoginSession: DriverLoginSession{
+		LoginSession: domain.DriverLoginSession{
 			DeviceID: "default-device-id",
 		},
-		Type: DriverType{
+		Type: domain.DriverType{
 			CompanyApproveStatus: 0,
 			JobAcceptStatus:      nil,
 			IsInternalCompany:    false,
@@ -111,7 +90,7 @@ func processUpdate(driverID string, updateData map[string]interface{}) {
 
 	driver, exists := drivers[driverID]
 	if !exists {
-		driver = DriverDTO{}
+		driver = domain.DriverDTO{}
 	}
 
 	if loc, ok := updateData["location"].(map[string]interface{}); ok {
@@ -139,7 +118,7 @@ func processUpdate(driverID string, updateData map[string]interface{}) {
 	broadcastLocation(driverID, driver)
 }
 
-func broadcastLocation(driverID string, driver DriverDTO) {
+func broadcastLocation(driverID string, driver domain.DriverDTO) {
 	muRead.Lock()
 	defer muRead.Unlock()
 

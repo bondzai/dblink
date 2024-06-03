@@ -9,6 +9,7 @@ import (
 )
 
 type DriverDTO struct {
+	ID           string             `json:"id"`
 	Location     DriverLocation     `json:"location"`
 	LoginSession DriverLoginSession `json:"loginSession"`
 	Type         DriverType         `json:"type"`
@@ -21,7 +22,7 @@ type DriverLocation struct {
 }
 
 type DriverLoginSession struct {
-	DeviceId string `json:"deviceId"`
+	DeviceID string `json:"deviceId"`
 }
 
 type DriverType struct {
@@ -51,6 +52,12 @@ func main() {
 		clients[driverID][c] = true
 		lock.Unlock()
 
+		// Send DTO instantly on connection
+		dto := createDriverDTO(driverID)
+		if err := c.WriteJSON(dto); err != nil {
+			return
+		}
+
 		defer func() {
 			lock.Lock()
 			delete(clients[driverID], c)
@@ -74,6 +81,27 @@ func main() {
 	app.Listen(":8080")
 }
 
+func createDriverDTO(driverID string) DriverDTO {
+	// Construct your DriverDTO here with any initial data you want to send to the client
+	return DriverDTO{
+		ID: driverID,
+		Location: DriverLocation{
+			Lat:  "0",
+			Long: "0",
+		},
+		LoginSession: DriverLoginSession{
+			DeviceID: "default-device-id",
+		},
+		Type: DriverType{
+			CompanyApproveStatus: 0,
+			JobAcceptStatus:      nil,
+			IsInternalCompany:    false,
+			VehicleTypeID:        uuid.Nil,
+		},
+		Job: nil,
+	}
+}
+
 func processUpdate(driverID string, updateData map[string]interface{}) {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -94,7 +122,7 @@ func processUpdate(driverID string, updateData map[string]interface{}) {
 
 	if session, ok := updateData["loginSession"].(map[string]interface{}); ok {
 		if deviceId, ok := session["deviceId"].(string); ok {
-			driver.LoginSession.DeviceId = deviceId
+			driver.LoginSession.DeviceID = deviceId
 		}
 	}
 

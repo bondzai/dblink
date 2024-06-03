@@ -18,19 +18,19 @@ func NewDriverService(repo *repository.RedisRepository) *DriverService {
 	}
 }
 
-func (s *DriverService) GetLatestData(driverID string) domain.DriverDTO {
+func (s *DriverService) GetLatestData(driverID string) *domain.DriverDTO {
 	driver, err := s.repo.GetDriver(driverID)
 
 	if err != nil {
 		slog.Error("Error getting data in Redis", err)
-		return domain.DriverDTO{}
+		return &domain.DriverDTO{}
 	}
 
 	if driver.Id == "" {
 		defaultDriver := s.getDefaultData(driverID)
 		if err := s.repo.SaveDriver(defaultDriver); err != nil {
 			slog.Error("Error setting default driver data in Redis", err)
-			return domain.DriverDTO{}
+			return &domain.DriverDTO{}
 		}
 		return defaultDriver
 	}
@@ -68,12 +68,12 @@ func (s *DriverService) ProcessUpdate(driverID string, updateData map[string]int
 		slog.Error("Error setting data in Redis", err)
 	}
 
-	return &driver
+	return driver
 }
 
 // todo: query data from db and other services instead of mock.
-func (s *DriverService) getDefaultData(driverID string) domain.DriverDTO {
-	return domain.DriverDTO{
+func (s *DriverService) getDefaultData(driverID string) *domain.DriverDTO {
+	return &domain.DriverDTO{
 		Id: driverID,
 		Location: domain.DriverLocation{
 			Lat:  "0",

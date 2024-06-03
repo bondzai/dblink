@@ -126,6 +126,12 @@ func processUpdate(driverID string, updateData map[string]interface{}) {
 		}
 	}
 
+	if driverType, ok := updateData["Type"].(map[string]interface{}); ok {
+		if isInternalCompany, ok := driverType["isInternalCompany"].(bool); ok {
+			driver.Type.IsInternalCompany = isInternalCompany
+		}
+	}
+
 	drivers[driverID] = driver
 	broadcastLocation(driverID, driver)
 }

@@ -51,8 +51,7 @@ func main() {
 		clients[driverID][c] = true
 		muRead.Unlock()
 
-		// Send DTO instantly on connection
-		dto := createDriverDTO(driverID)
+		dto := getLatestData(driverID)
 		if err := c.WriteJSON(dto); err != nil {
 			return
 		}
@@ -80,7 +79,7 @@ func main() {
 	app.Listen(":8080")
 }
 
-func createDriverDTO(driverID string) DriverDTO {
+func getLatestData(driverID string) DriverDTO {
 	muRead.Lock()
 	defer muRead.Unlock()
 

@@ -88,10 +88,7 @@ func processUpdate(driverID string, updateData map[string]interface{}) {
 	muUpdate.Lock()
 	defer muUpdate.Unlock()
 
-	driver, exists := drivers[driverID]
-	if !exists {
-		driver = domain.DriverDTO{}
-	}
+	driver := getLatestData(driverID)
 
 	if loc, ok := updateData["location"].(map[string]interface{}); ok {
 		if lat, ok := loc["lat"].(string); ok {

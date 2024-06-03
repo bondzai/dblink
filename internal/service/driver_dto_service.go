@@ -1,7 +1,7 @@
 package service
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/bondzai/dblink/internal/domain"
 	"github.com/bondzai/dblink/internal/repository"
@@ -22,14 +22,14 @@ func (s *DriverService) GetLatestData(driverID string) domain.DriverDTO {
 	driver, err := s.repo.GetDriver(driverID)
 
 	if err != nil {
-		log.Printf("Error getting data from Redis: %v", err)
+		slog.Error("Error getting data in Redis", err)
 		return domain.DriverDTO{}
 	}
 
 	if driver.Id == "" {
 		defaultDriver := s.getDefaultData(driverID)
 		if err := s.repo.SaveDriver(defaultDriver); err != nil {
-			log.Printf("Error setting default driver data in Redis: %v", err)
+			slog.Error("Error setting default driver data in Redis", err)
 			return domain.DriverDTO{}
 		}
 		return defaultDriver
@@ -52,23 +52,26 @@ func (s *DriverService) ProcessUpdate(driverID string, updateData map[string]int
 
 	if session, ok := updateData["loginSession"].(map[string]interface{}); ok {
 		if deviceId, ok := session["deviceId"].(string); ok {
+			// todo: save data to db
 			driver.LoginSession.DeviceID = deviceId
 		}
 	}
 
 	if driverType, ok := updateData["type"].(map[string]interface{}); ok {
 		if isInternalCompany, ok := driverType["isInternalCompany"].(bool); ok {
+			// todo: save data to db
 			driver.Type.IsInternalCompany = isInternalCompany
 		}
 	}
 
 	if err := s.repo.SaveDriver(driver); err != nil {
-		log.Printf("Error setting data in Redis: %v", err)
+		slog.Error("Error setting data in Redis", err)
 	}
 
 	return &driver
 }
 
+// todo: query data from db and other services instead of mock.
 func (s *DriverService) getDefaultData(driverID string) domain.DriverDTO {
 	return domain.DriverDTO{
 		Id: driverID,

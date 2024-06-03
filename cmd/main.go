@@ -88,9 +88,7 @@ func createDriverDTO(driverID string) DriverDTO {
 		return driver
 	}
 
-	// If the driver doesn't exist, Query from database and construct a new DriverDTO
 	return DriverDTO{
-		ID: driverID,
 		Location: DriverLocation{
 			Lat:  "0",
 			Long: "0",

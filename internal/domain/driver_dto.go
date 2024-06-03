@@ -3,6 +3,7 @@ package domain
 import "github.com/google/uuid"
 
 type DriverDTO struct {
+	Id           string             `json:"id"`
 	Location     DriverLocation     `json:"location"`
 	LoginSession DriverLoginSession `json:"loginSession"`
 	Type         DriverType         `json:"type"`

@@ -8,21 +8,21 @@ import (
 	"github.com/gofiber/websocket/v2"
 )
 
-type DriverHandler struct {
-	service *service.DriverService
+type DriverWsHandler struct {
+	service *service.DriverWsService
 	clients map[string]map[*websocket.Conn]bool
 	mu      *sync.Mutex
 }
 
-func NewDriverHandler(service *service.DriverService) *DriverHandler {
-	return &DriverHandler{
+func NewDriverWsHandler(service *service.DriverWsService) *DriverWsHandler {
+	return &DriverWsHandler{
 		service: service,
 		clients: make(map[string]map[*websocket.Conn]bool),
 		mu:      &sync.Mutex{},
 	}
 }
 
-func (h *DriverHandler) WebSocketHandler(c *websocket.Conn) {
+func (h *DriverWsHandler) WebSocketHandler(c *websocket.Conn) {
 	driverID := c.Params("id")
 
 	h.mu.Lock()
@@ -59,7 +59,7 @@ func (h *DriverHandler) WebSocketHandler(c *websocket.Conn) {
 	}
 }
 
-func (h *DriverHandler) broadcastLocation(driverID string, driver domain.DriverWsDto) {
+func (h *DriverWsHandler) broadcastLocation(driverID string, driver domain.DriverWsDto) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 

@@ -20,8 +20,8 @@ func main() {
 	})
 
 	redisRepo := repository.NewRedisRepository(redisClient, ctx)
-	driverService := service.NewDriverService(redisRepo)
-	driverHandler := handler.NewDriverHandler(driverService)
+	driverService := service.NewDriverWsService(redisRepo)
+	driverHandler := handler.NewDriverWsHandler(driverService)
 
 	app := fiber.New()
 

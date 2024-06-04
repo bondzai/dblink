@@ -8,17 +8,17 @@ import (
 	"github.com/google/uuid"
 )
 
-type DriverService struct {
+type DriverWsService struct {
 	repo *repository.RedisRepository
 }
 
-func NewDriverService(repo *repository.RedisRepository) *DriverService {
-	return &DriverService{
+func NewDriverWsService(repo *repository.RedisRepository) *DriverWsService {
+	return &DriverWsService{
 		repo: repo,
 	}
 }
 
-func (s *DriverService) GetLatestData(driverID string) *domain.DriverWsDto {
+func (s *DriverWsService) GetLatestData(driverID string) *domain.DriverWsDto {
 	driver, err := s.repo.GetDriver(driverID)
 
 	if err != nil {
@@ -38,7 +38,7 @@ func (s *DriverService) GetLatestData(driverID string) *domain.DriverWsDto {
 	return driver
 }
 
-func (s *DriverService) ProcessUpdate(driverID string, updateData map[string]interface{}) *domain.DriverWsDto {
+func (s *DriverWsService) ProcessUpdate(driverID string, updateData map[string]interface{}) *domain.DriverWsDto {
 	driver := s.GetLatestData(driverID)
 
 	if loc, ok := updateData["location"].(map[string]interface{}); ok {
@@ -72,7 +72,7 @@ func (s *DriverService) ProcessUpdate(driverID string, updateData map[string]int
 }
 
 // todo: query data from db and other services instead of mock.
-func (s *DriverService) getDefaultData(driverID string) *domain.DriverWsDto {
+func (s *DriverWsService) getDefaultData(driverID string) *domain.DriverWsDto {
 	return &domain.DriverWsDto{
 		Id: driverID,
 		Location: domain.DriverLocation{

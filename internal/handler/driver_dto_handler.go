@@ -59,7 +59,7 @@ func (h *DriverHandler) WebSocketHandler(c *websocket.Conn) {
 	}
 }
 
-func (h *DriverHandler) broadcastLocation(driverID string, driver domain.DriverDTO) {
+func (h *DriverHandler) broadcastLocation(driverID string, driver domain.DriverWsDto) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 

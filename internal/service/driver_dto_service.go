@@ -5,7 +5,6 @@ import (
 
 	"github.com/bondzai/dblink/internal/domain"
 	"github.com/bondzai/dblink/internal/repository"
-	"github.com/google/uuid"
 )
 
 type DriverWsService struct {
@@ -86,8 +85,8 @@ func (s *DriverWsService) getDefaultData(driverID string) *domain.DriverWsDto {
 			CompanyApproveStatus: 0,
 			JobAcceptStatus:      nil,
 			IsInternalCompany:    false,
-			VehicleTypeID:        uuid.Nil,
+			VehicleTypeID:        nil,
 		},
-		Job: nil,
+		JobId: nil,
 	}
 }

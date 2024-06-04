@@ -7,7 +7,7 @@ type DriverWsDto struct {
 	Location     DriverLocation     `json:"location"`
 	LoginSession DriverLoginSession `json:"loginSession"`
 	Type         DriverType         `json:"type"`
-	Job          *uuid.UUID         `json:"job"`
+	JobId        *uuid.UUID         `json:"jobId"`
 }
 
 type DriverLocation struct {
@@ -20,8 +20,8 @@ type DriverLoginSession struct {
 }
 
 type DriverType struct {
-	CompanyApproveStatus int       `json:"companyApproveStatus"`
-	JobAcceptStatus      *int      `json:"jobAcceptStatus"`
-	IsInternalCompany    bool      `json:"isInternalCompany"`
-	VehicleTypeID        uuid.UUID `json:"vehicleTypeId"`
+	CompanyApproveStatus int        `json:"companyApproveStatus"`
+	JobAcceptStatus      *int       `json:"jobAcceptStatus"`
+	IsInternalCompany    bool       `json:"isInternalCompany"`
+	VehicleTypeID        *uuid.UUID `json:"vehicleTypeId"`
 }

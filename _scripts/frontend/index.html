@@ -10,7 +10,7 @@
             const driverID = uuidv4();
             console.log("Driver ID:", driverID);
 
-            const socket = new WebSocket(`ws://localhost:9000/api/v1/ws/${driverID}`);
+            const socket = new WebSocket(`ws://localhost:8080/ws/${driverID}`);
 
             socket.onmessage = function(event) {
                 const driver = JSON.parse(event.data);
@@ -35,6 +35,11 @@
 
                 const deviceId = uuidv4();
                 console.log('Device ID:', deviceId);
+                socket.send(JSON.stringify({
+                    loginSession: {
+                            deviceId: deviceId
+                        }
+                }));
 
                 setInterval(() => {
                     const lat = (Math.random() * 180 - 90).toFixed(6);
@@ -45,9 +50,6 @@
                             lat: lat,
                             long: long
                         },
-                        loginSession: {
-                            deviceId: deviceId
-                        }
                     };
 
                     socket.send(JSON.stringify(update));

@@ -10,7 +10,7 @@
             const driverID = uuidv4();
             console.log("Driver ID:", driverID);
 
-            const socket = new WebSocket(`ws://localhost:8080/ws/${driverID}`);
+            const socket = new WebSocket(`ws://localhost:9000/api/v1/ws/${driverID}`);
 
             socket.onmessage = function(event) {
                 const driver = JSON.parse(event.data);

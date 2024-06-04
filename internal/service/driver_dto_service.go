@@ -7,17 +7,22 @@ import (
 	"github.com/bondzai/dblink/internal/repository"
 )
 
-type DriverWsService struct {
-	repo *repository.RedisRepository
+type DriverWsService interface {
+	GetLatestData(driverID string) *domain.DriverWsDto
+	ProcessUpdate(driverID string, updateData map[string]interface{}) *domain.DriverWsDto
 }
 
-func NewDriverWsService(repo *repository.RedisRepository) *DriverWsService {
-	return &DriverWsService{
+type driverWsService struct {
+	repo repository.RedisRepository
+}
+
+func NewDriverWsService(repo repository.RedisRepository) DriverWsService {
+	return &driverWsService{
 		repo: repo,
 	}
 }
 
-func (s *DriverWsService) GetLatestData(driverID string) *domain.DriverWsDto {
+func (s *driverWsService) GetLatestData(driverID string) *domain.DriverWsDto {
 	driver, err := s.repo.GetDriver(driverID)
 
 	if err != nil {
@@ -37,7 +42,7 @@ func (s *DriverWsService) GetLatestData(driverID string) *domain.DriverWsDto {
 	return driver
 }
 
-func (s *DriverWsService) ProcessUpdate(driverID string, updateData map[string]interface{}) *domain.DriverWsDto {
+func (s *driverWsService) ProcessUpdate(driverID string, updateData map[string]interface{}) *domain.DriverWsDto {
 	driver := s.GetLatestData(driverID)
 
 	if loc, ok := updateData["location"].(map[string]interface{}); ok {
@@ -71,7 +76,7 @@ func (s *DriverWsService) ProcessUpdate(driverID string, updateData map[string]i
 }
 
 // todo: query data from db and other services instead of mock.
-func (s *DriverWsService) getDefaultData(driverID string) *domain.DriverWsDto {
+func (s *driverWsService) getDefaultData(driverID string) *domain.DriverWsDto {
 	return &domain.DriverWsDto{
 		Id: driverID,
 		Location: domain.DriverLocation{

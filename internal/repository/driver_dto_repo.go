@@ -8,21 +8,26 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type RedisRepository struct {
+type RedisRepository interface {
+	GetDriver(driverID string) (*domain.DriverWsDto, error)
+	SaveDriver(driver *domain.DriverWsDto) error
+}
+
+type redisRepository struct {
 	client *redis.Client
 	ctx    context.Context
 }
 
 const redisKeyPrefix = "driver:"
 
-func NewRedisRepository(client *redis.Client, ctx context.Context) *RedisRepository {
-	return &RedisRepository{
+func NewRedisRepository(client *redis.Client, ctx context.Context) RedisRepository {
+	return &redisRepository{
 		client: client,
 		ctx:    ctx,
 	}
 }
 
-func (r *RedisRepository) GetDriver(driverID string) (*domain.DriverWsDto, error) {
+func (r *redisRepository) GetDriver(driverID string) (*domain.DriverWsDto, error) {
 	key := redisKeyPrefix + driverID
 
 	val, err := r.client.Get(r.ctx, key).Result()
@@ -40,7 +45,7 @@ func (r *RedisRepository) GetDriver(driverID string) (*domain.DriverWsDto, error
 	return &driver, nil
 }
 
-func (r *RedisRepository) SaveDriver(driver *domain.DriverWsDto) error {
+func (r *redisRepository) SaveDriver(driver *domain.DriverWsDto) error {
 	key := redisKeyPrefix + driver.Id
 	data, err := json.Marshal(driver)
 	if err != nil {
